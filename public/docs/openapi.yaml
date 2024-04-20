@@ -1,0 +1,717 @@
+openapi: 3.0.3
+info:
+  title: Laravel
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+paths:
+  /api/documentation:
+    get:
+      summary: 'Display Swagger API page.'
+      operationId: displaySwaggerAPIPage
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>L5 Swagger UI</title>\r\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"http://localhost:8000/docs/asset/swagger-ui.css?v=46937e45e4e342ab1be319bfa1351777\">\r\n    <link rel=\"icon\" type=\"image/png\" href=\"http://localhost:8000/docs/asset/favicon-32x32.png?v=40d4f2c38d1cd854ad463f16373cbcb6\" sizes=\"32x32\"/>\r\n    <link rel=\"icon\" type=\"image/png\" href=\"http://localhost:8000/docs/asset/favicon-16x16.png?v=f0ae831196d55d8f4115b6c5e8ec5384\" sizes=\"16x16\"/>\r\n    <style>\r\n    html\r\n    {\r\n        box-sizing: border-box;\r\n        overflow: -moz-scrollbars-vertical;\r\n        overflow-y: scroll;\r\n    }\r\n    *,\r\n    *:before,\r\n    *:after\r\n    {\r\n        box-sizing: inherit;\r\n    }\r\n\r\n    body {\r\n      margin:0;\r\n      background: #fafafa;\r\n    }\r\n    </style>\r\n</head>\r\n\r\n<body>\r\n<div id=\"swagger-ui\"></div>\r\n\r\n<script src=\"http://localhost:8000/docs/asset/swagger-ui-bundle.js?v=ee366539733b2ba07b0154afe95e0271\"></script>\r\n<script src=\"http://localhost:8000/docs/asset/swagger-ui-standalone-preset.js?v=dfe1d704dc37a698d41fab41a983c629\"></script>\r\n<script>\r\n    window.onload = function() {\r\n        // Build a system\r\n        const ui = SwaggerUIBundle({\r\n            dom_id: '#swagger-ui',\r\n            url: \"http://localhost:8000/docs/api-docs.json\",\r\n            operationsSorter: null,\r\n            configUrl: null,\r\n            validatorUrl: null,\r\n            oauth2RedirectUrl: \"http://localhost:8000/api/oauth2-callback\",\r\n\r\n            requestInterceptor: function(request) {\r\n                request.headers['X-CSRF-TOKEN'] = '';\r\n                return request;\r\n            },\r\n\r\n            presets: [\r\n                SwaggerUIBundle.presets.apis,\r\n                SwaggerUIStandalonePreset\r\n            ],\r\n\r\n            plugins: [\r\n                SwaggerUIBundle.plugins.DownloadUrl\r\n            ],\r\n\r\n            layout: \"StandaloneLayout\",\r\n            docExpansion : \"none\",\r\n            deepLinking: true,\r\n            filter: true,\r\n            persistAuthorization: \"false\",\r\n\r\n        })\r\n\r\n        window.ui = ui\r\n\r\n            }\r\n</script>\r\n</body>\r\n</html>\r\n"
+      tags:
+        - Endpoints
+      security: []
+  /api/oauth2-callback:
+    get:
+      summary: 'Display Oauth2 callback pages.'
+      operationId: displayOauth2CallbackPages
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "<!doctype html>\r\n<html lang=\"en-US\">\r\n<head>\r\n    <title>Swagger UI: OAuth2 Redirect</title>\r\n</head>\r\n<body>\r\n<script>\r\n    'use strict';\r\n    function run () {\r\n        var oauth2 = window.opener.swaggerUIRedirectOauth2;\r\n        var sentState = oauth2.state;\r\n        var redirectUrl = oauth2.redirectUrl;\r\n        var isValid, qp, arr;\r\n\r\n        if (/code|token|error/.test(window.location.hash)) {\r\n            qp = window.location.hash.substring(1).replace('?', '&');\r\n        } else {\r\n            qp = location.search.substring(1);\r\n        }\r\n\r\n        arr = qp.split(\"&\");\r\n        arr.forEach(function (v,i,_arr) { _arr[i] = '\"' + v.replace('=', '\":\"') + '\"';});\r\n        qp = qp ? JSON.parse('{' + arr.join() + '}',\r\n                function (key, value) {\r\n                    return key === \"\" ? value : decodeURIComponent(value);\r\n                }\r\n        ) : {};\r\n\r\n        isValid = qp.state === sentState;\r\n\r\n        if ((\r\n          oauth2.auth.schema.get(\"flow\") === \"accessCode\" ||\r\n          oauth2.auth.schema.get(\"flow\") === \"authorizationCode\" ||\r\n          oauth2.auth.schema.get(\"flow\") === \"authorization_code\"\r\n        ) && !oauth2.auth.code) {\r\n            if (!isValid) {\r\n                oauth2.errCb({\r\n                    authId: oauth2.auth.name,\r\n                    source: \"auth\",\r\n                    level: \"warning\",\r\n                    message: \"Authorization may be unsafe, passed state was changed in server. The passed state wasn't returned from auth server.\"\r\n                });\r\n            }\r\n\r\n            if (qp.code) {\r\n                delete oauth2.state;\r\n                oauth2.auth.code = qp.code;\r\n                oauth2.callback({auth: oauth2.auth, redirectUrl: redirectUrl});\r\n            } else {\r\n                let oauthErrorMsg;\r\n                if (qp.error) {\r\n                    oauthErrorMsg = \"[\"+qp.error+\"]: \" +\r\n                        (qp.error_description ? qp.error_description+ \". \" : \"no accessCode received from the server. \") +\r\n                        (qp.error_uri ? \"More info: \"+qp.error_uri : \"\");\r\n                }\r\n\r\n                oauth2.errCb({\r\n                    authId: oauth2.auth.name,\r\n                    source: \"auth\",\r\n                    level: \"error\",\r\n                    message: oauthErrorMsg || \"[Authorization failed]: no accessCode received from the server.\"\r\n                });\r\n            }\r\n        } else {\r\n            oauth2.callback({auth: oauth2.auth, token: qp, isValid: isValid, redirectUrl: redirectUrl});\r\n        }\r\n        window.close();\r\n    }\r\n\r\n    if (document.readyState !== 'loading') {\r\n        run();\r\n    } else {\r\n        document.addEventListener('DOMContentLoaded', function () {\r\n            run();\r\n        });\r\n    }\r\n</script>\r\n</body>\r\n</html>\r\n"
+      tags:
+        - Endpoints
+      security: []
+  /api/user:
+    get:
+      summary: ''
+      operationId: getApiUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/cities:
+    get:
+      summary: ''
+      operationId: getApiCities
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiCities
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/cities/{id}':
+    get:
+      summary: ''
+      operationId: getApiCitiesId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\City] 19'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiCitiesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiCitiesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the city.'
+        example: 19
+        required: true
+        schema:
+          type: integer
+  /api/states:
+    get:
+      summary: ''
+      operationId: getApiStates
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiStates
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/states/{id}':
+    get:
+      summary: ''
+      operationId: getApiStatesId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\State] 18'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiStatesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiStatesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the state.'
+        example: 18
+        required: true
+        schema:
+          type: integer
+  /api/banks:
+    get:
+      summary: ''
+      operationId: getApiBanks
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiBanks
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/banks/{id}':
+    get:
+      summary: ''
+      operationId: getApiBanksId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\Bank] 14'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiBanksId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiBanksId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the bank.'
+        example: 14
+        required: true
+        schema:
+          type: integer
+  /api/bills:
+    get:
+      summary: ''
+      operationId: getApiBills
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiBills
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/bills/{id}':
+    get:
+      summary: ''
+      operationId: getApiBillsId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\Bill] 7'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiBillsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiBillsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the bill.'
+        example: 7
+        required: true
+        schema:
+          type: integer
+  /api/cars:
+    get:
+      summary: ''
+      operationId: getApiCars
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiCars
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/cars/{id}':
+    get:
+      summary: ''
+      operationId: getApiCarsId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\Car] 16'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiCarsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiCarsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the car.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  /api/customer_services:
+    get:
+      summary: ''
+      operationId: getApiCustomer_services
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiCustomer_services
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/customer_services/{id}':
+    get:
+      summary: ''
+      operationId: getApiCustomer_servicesId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\CustomerService] 13'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiCustomer_servicesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiCustomer_servicesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the customer service.'
+        example: 13
+        required: true
+        schema:
+          type: integer
+  /api/feedback:
+    get:
+      summary: ''
+      operationId: getApiFeedback
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiFeedback
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/feedback/{id}':
+    get:
+      summary: ''
+      operationId: getApiFeedbackId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\Feedback] 15'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiFeedbackId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiFeedbackId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the feedback.'
+        example: 15
+        required: true
+        schema:
+          type: integer
+  /api/rental:
+    get:
+      summary: ''
+      operationId: getApiRental
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiRental
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/rental/{id}':
+    get:
+      summary: ''
+      operationId: getApiRentalId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\Rental] 2'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiRentalId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiRentalId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the rental.'
+        example: 2
+        required: true
+        schema:
+          type: integer
+  /api/roles:
+    get:
+      summary: ''
+      operationId: getApiRoles
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: []
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiRoles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/roles/{id}':
+    get:
+      summary: ''
+      operationId: getApiRolesId
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'No query results for model [App\Models\Role] 18'
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiRolesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiRolesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the role.'
+        example: 18
+        required: true
+        schema:
+          type: integer
+tags:
+  -
+    name: Endpoints
+    description: ''

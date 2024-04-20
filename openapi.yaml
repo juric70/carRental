@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: 'API Documentation'
+  contact:
+    email: andjela.juric12@gmail.com
+  version: '0.1'
+servers:
+  -
+    url: 'https://localhost:8000/api/'
+    description: 'Learning env'
+paths:
+  /bills:
+    get:
+      summary: 'Get a list of bills'
+      description: 'Returns a list of bills'
+      operationId: 8449b183877a6369b035a24d37a0fe50
+      responses:
+        '200':
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bill'
+    post:
+      summary: 'Create a new bill'
+      description: 'Creates a new bill'
+      operationId: da38097067415988b137bc784628ac85
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+      responses:
+        '201':
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+        '422':
+          description: 'Validation error'
+  '/bills/{id}':
+    get:
+      summary: 'Get bill information'
+      description: 'Returns bill data'
+      operationId: f17e87d4d6a27b36ad777673755b0570
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Bill ID'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+        '404':
+          description: 'Bill not found'
+    put:
+      summary: 'Update an existing bill'
+      description: 'Updates an existing bill'
+      operationId: def90d772e581ecc6bca5f292e6ddec6
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Bill ID'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+      responses:
+        '200':
+          description: 'Bill updated successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+        '404':
+          description: 'Bill not found'
+        '422':
+          description: 'Validation error'
+    delete:
+      summary: 'Delete a specific bill'
+      description: 'Deletes a bill'
+      operationId: 38fca05d4aab142fb629601a72cfbaea
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Bill ID'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 'Bill deleted successfully'
+        '404':
+          description: 'Bill not found'
