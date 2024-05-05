@@ -63,6 +63,34 @@ $(document).ready(function() {
         }
     });
 
-    // Inicijalno učitavanje podataka
+
     loadData();
 });
+
+const searchQuery = document.getElementById('searchQuery');
+const searchResults = document.getElementById('searchResults');
+
+searchQuery.addEventListener('input', function() {
+    const query = searchQuery.value;
+    axios.get('/api/search', { params: { query: query } })
+        .then(response => {
+            const results = response.data;
+            searchResults.innerHTML = '';
+            if (results.length) {
+                const ul = document.createElement('ul');
+                results.forEach(result => {
+                    const li = document.createElement('li');
+                    li.textContent = result.name;
+                    ul.appendChild(li);
+                });
+                searchResults.appendChild(ul);
+            } else {
+                searchResults.textContent = 'Nema rezultata za prikaz.';
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            searchResults.textContent = 'Došlo je do greške prilikom pretrage.';
+        });
+});
+

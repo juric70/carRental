@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerServiceController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -107,6 +108,7 @@ Route::controller(StateController::class)->group(function (){
     Route::delete('states/{id}', 'destroy');
 
 });
+Route::get('/search', [SearchController::class, 'search']);
 
 
 
