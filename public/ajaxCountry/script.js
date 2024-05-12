@@ -35,7 +35,7 @@ $(document).ready(function() {
     // Ažuriranje modela
     $('#editForm').submit(function(e) {
         e.preventDefault();
-        var id = $(this).data('id');
+        var id = $('#id').val();
         console.log(id);
         var name = $('#name').val();
         $.ajax({
