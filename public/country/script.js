@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    const csrfToken = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken=')).split('=')[1];
 
-    console.log(csrfToken);
 
     // Funkcija za dohvat popisa država
     function getDrzave() {
@@ -28,15 +26,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (id) {
-        // Dohvati detalje države za uređivanje
-        fetchStateDetails(id, csrfToken);
+        
+        fetchStateDetails(id);
     } else {
         // Ako nema ID-a u URL-u, prikaži običan popis država
         getDrzave();
     }
 });
 
-function fetchStateDetails(id, csrfToken) {
+function fetchStateDetails(id) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', `http://127.0.0.1:8000/api/states/${id}`, true);
     xhr.onload = function () {
@@ -44,13 +42,13 @@ function fetchStateDetails(id, csrfToken) {
             const drzava = JSON.parse(this.responseText);
             document.getElementById('name').value = drzava?.name;
             document.getElementById('code').value = drzava?.code; // Dodajte ovo ako postoji polje 'code'
-            setupEditForm(id, csrfToken);
+            setupEditForm(id);
         }
     }
     xhr.send();
 }
 
-function setupEditForm(id, csrfToken) {
+function setupEditForm(id) {
     const editForm = document.getElementById('edit-form');
     editForm.onsubmit = function (e) {
         e.preventDefault();
@@ -60,7 +58,6 @@ function setupEditForm(id, csrfToken) {
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', `http://127.0.0.1:8000/api/states/${id}`, true);
         xhr.setRequestHeader('Content-type', 'application/json');
-        xhr.setRequestHeader("X-CSRF-TOKEN", csrfToken); // Ispravljeno na velika slova
         xhr.setRequestHeader("Accept", "application/json");
 
         xhr.onload = function () {
@@ -79,10 +76,9 @@ function editState(id) {
 function deleteState(id) {
     const confirmDelete = confirm('Jeste li sigurni da želite izbrisati ovu državu?');
     if (confirmDelete) {
-        const csrfToken = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken=')).split('=')[1];
-        const xhr = new XMLHttpRequest();
+         const xhr = new XMLHttpRequest();
         xhr.open('DELETE', `http://127.0.0.1:8000/api/states/${id}`, true);
-        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+
         xhr.onload = function () {
             if (this.status === 200) {
                 window.location.reload(); // Osvježi stranicu umjesto preusmjeravanja na index.html
