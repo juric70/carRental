@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD App</title>
+    <!-- Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+<div id="app">
+    <h1>Bills</h1>
+    <button @click="fetchBills">Fetch Bills</button>
+    <ul>
+        <li v-for="bill in bills" :key="bill.id">
+            <div>
+                <strong>ID:</strong> {{ bill.id }}
+            </div>
+            <div>
+                <strong>User ID:</strong> {{ bill.user_id }}
+            </div>
+            <div>
+                <strong>Total:</strong> {{ bill.total }}
+            </div>
+            <div>
+                <strong>Status:</strong> {{ bill.status }}
+            </div>
+            <div>
+                <strong>Bank ID:</strong> {{ bill.bank_id }}
+            </div>
+            <button @click="deleteBill(bill.id)">Delete</button>
+            <button @click="editBill(bill)">Edit</button>
+        </li>
+    </ul>
+    <h2>Add New Bill</h2>
+    <form @submit.prevent="addBill">
+        <input type="number" v-model="newBill.user_id" placeholder="User ID" required>
+        <input type="number" v-model="newBill.total" placeholder="Total" required>
+        <input type="text" v-model="newBill.status" placeholder="Status" required>
+        <input type="number" v-model="newBill.bank_id" placeholder="Bank ID" required>
+        <button type="submit">Add Bill</button>
+    </form>
+    <h2 v-if="editMode">Edit Bill</h2>
+    <form v-if="editMode" @submit.prevent="updateBill">
+        <input type="number" v-model="editedBill.user_id" placeholder="User ID" required>
+        <input type="number" v-model="editedBill.total" placeholder="Total" required>
+        <input type="text" v-model="editedBill.status" placeholder="Status" required>
+        <input type="number" v-model="editedBill.bank_id" placeholder="Bank ID" required>
+        <button type="submit">Update Bill</button>
+        <button @click="cancelEdit">Cancel</button>
+    </form>
+
+    <h1>Cars</h1>
+    <button @click="fetchCars">Fetch Cars</button>
+    <ul>
+        <li v-for="car in cars" :key="car.id">
+            <div>
+                <strong>ID:</strong> {{ car.id }}
+            </div>
+            <div>
+                <strong>License Plate:</strong> {{ car.license_plate }}
+            </div>
+            <div>
+                <strong>Model:</strong> {{ car.model }}
+            </div>
+            <div>
+                <strong>Brand:</strong> {{ car.brand }}
+            </div>
+            <div>
+                <strong>Color:</strong> {{ car.color }}
+            </div>
+            <div>
+                <strong>Year:</strong> {{ car.year }}
+            </div>
+            <div>
+                <strong>User ID:</strong> {{ car.user_id }}
+            </div>
+            <div>
+                <strong>Customer Service ID:</strong> {{ car.customer_service_id }}
+            </div>
+            <button @click="deleteCar(car.id)">Delete</button>
+            <button @click="editCar(car)">Edit</button>
+        </li>
+    </ul>
+    <h2>Add New Car</h2>
+    <form @submit.prevent="addCar">
+        <input type="text" v-model="newCar.license_plate" placeholder="License Plate" required>
+        <input type="text" v-model="newCar.model" placeholder="Model" required>
+        <input type="text" v-model="newCar.brand" placeholder="Brand" required>
+        <input type="text" v-model="newCar.color" placeholder="Color" required>
+        <input type="number" v-model="newCar.year" placeholder="Year" required>
+        <input type="number" v-model="newCar.user_id" placeholder="User ID" required>
+        <input type="number" v-model="newCar.customer_service_id" placeholder="Customer Service ID" required>
+        <button type="submit">Add Car</button>
+    </form>
+    <h2 v-if="editModeCar">Edit Car</h2>
+    <form v-if="editModeCar" @submit.prevent="updateCar">
+        <input type="text" v-model="editedCar.license_plate" placeholder="License Plate" required>
+        <input type="text" v-model="editedCar.model" placeholder="Model" required>
+        <input type="text" v-model="editedCar.brand" placeholder="Brand" required>
+        <input type="text" v-model="editedCar.color" placeholder="Color" required>
+        <input type="number" v-model="editedCar.year" placeholder="Year" required>
+        <input type="number" v-model="editedCar.user_id" placeholder="User ID" required>
+        <input type="number" v-model="editedCar.customer_service_id" placeholder="Customer Service ID" required>
+        <button type="submit">Update Car</button>
+        <button @click="cancelEditCar">Cancel</button>
+    </form>
+
+    <h1>Rentals</h1>
+    <button @click="fetchRentals">Fetch Rentals</button>
+    <ul>
+        <li v-for="rental in rentals" :key="rental.id">
+            <div>
+                <strong>ID:</strong> {{ rental.id }}
+            </div>
+            <div>
+                <strong>Start Date:</strong> {{ rental.start_date }}
+            </div>
+            <div>
+                <strong>End Date:</strong> {{ rental.end_date }}
+            </div>
+            <div>
+                <strong>Car ID:</strong> {{ rental.car_id }}
+            </div>
+            <div>
+                <strong>Bill ID:</strong> {{ rental.bill_id }}
+            </div>
+            <button @click="deleteRental(rental.id)">Delete</button>
+            <button @click="editRental(rental)">Edit</button>
+        </li>
+    </ul>
+    <h2>Add New Rental</h2>
+    <form @submit.prevent="addRental">
+        <input type="date" v-model="newRental.start_date" placeholder="Start Date" required>
+        <input type="date" v-model="newRental.end_date" placeholder="End Date" required>
+        <input type="number" v-model="newRental.car_id" placeholder="Car ID" required>
+        <input type="number" v-model="newRental.bill_id" placeholder="Bill ID" required>
+        <button type="submit">Add Rental</button>
+    </form>
+    <h2 v-if="editModeRental">Edit Rental</h2>
+    <form v-if="editModeRental" @submit.prevent="updateRental">
+        <input type="date" v-model="editedRental.start_date" placeholder="Start Date" required>
+        <input type="date" v-model="editedRental.end_date" placeholder="End Date" required>
+        <input type="number" v-model="editedRental.car_id" placeholder="Car ID" required>
+        <input type="number" v-model="editedRental.bill_id" placeholder="Bill ID" required>
+        <button type="submit">Update Rental</button>
+        <button @click="cancelEditRental">Cancel</button>
+    </form>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            bills: [],
+            newBill: {
+                user_id: '',
+                total: '',
+                status: '',
+                bank_id: ''
+            },
+            editMode: false,
+            editedBill: {
+                id: null,
+                user_id: '',
+                total: '',
+                status: '',
+                bank_id: ''
+            },
+            cars: [],
+            newCar: {
+                license_plate: '',
+                model: '',
+                brand: '',
+                color: '',
+                year: '',
+                user_id: '',
+                customer_service_id: ''
+            },
+            editModeCar: false,
+            editedCar: {
+                id: null,
+                license_plate: '',
+                model: '',
+                brand: '',
+                color: '',
+                year: '',
+                user_id: '',
+                customer_service_id: ''
+            },
+            rentals: [],
+            newRental: {
+                start_date: '',
+                end_date: '',
+                car_id: '',
+                bill_id: ''
+            },
+            editModeRental: false,
+            editedRental: {
+                id: null,
+                start_date: '',
+                end_date: '',
+                car_id: '',
+                bill_id: ''
+            }
+        },
+        methods: {
+            fetchBills() {
+                fetch('http://127.0.0.1:8000/api/bills')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.bills = data;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bills:', error);
+                    });
+            },
+            addBill() {
+                fetch('http://127.0.0.1:8000/api/bills', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.newBill)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchBills(); // Refresh the list after addition
+                        this.newBill = {
+                            user_id: '',
+                            total: '',
+                            status: '',
+                            bank_id: ''
+                        }; // Clear input fields
+                    })
+                    .catch(error => {
+                        console.error('Error adding bill:', error);
+                    });
+            },
+            editBill(bill) {
+                this.editMode = true;
+                this.editedBill = {
+                    id: bill.id,
+                    user_id: bill.user_id,
+                    total: bill.total,
+                    status: bill.status,
+                    bank_id: bill.bank_id
+                };
+            },
+            updateBill() {
+                fetch(`http://127.0.0.1:8000/api/bills/${this.editedBill.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.editedBill)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchBills(); // Refresh the list after update
+                        this.editMode = false; // Exit edit mode
+                        this.editedBill = {
+                            id: null,
+                            user_id: '',
+                            total: '',
+                            status: '',
+                            bank_id: ''
+                        }; // Clear editedBill object
+                    })
+                    .catch(error => {
+                        console.error('Error updating bill:', error);
+                    });
+            },
+            cancelEdit() {
+                this.editMode = false;
+                this.editedBill = {
+                    id: null,
+                    user_id: '',
+                    total: '',
+                    status: '',
+                    bank_id: ''
+                };
+            },
+            deleteBill(id) {
+                fetch(`http://127.0.0.1:8000/api/bills/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchBills(); // Refresh the list after deletion
+                    })
+                    .catch(error => {
+                        console.error('Error deleting bill:', error);
+                    });
+            },
+            fetchCars() {
+                fetch('http://127.0.0.1:8000/api/cars')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.cars = data;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cars:', error);
+                    });
+            },
+            addCar() {
+                fetch('http://127.0.0.1:8000/api/cars', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.newCar)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchCars(); // Refresh the list after addition
+                        this.newCar = {
+                            license_plate: '',
+                            model: '',
+                            brand: '',
+                            color: '',
+                            year: '',
+                            user_id: '',
+                            customer_service_id: ''
+                        }; // Clear input fields
+                    })
+                    .catch(error => {
+                        console.error('Error adding car:', error);
+                    });
+            },
+            editCar(car) {
+                this.editModeCar = true;
+                this.editedCar = {
+                    id: car.id,
+                    license_plate: car.license_plate,
+                    model: car.model,
+                    brand: car.brand,
+                    color: car.color,
+                    year: car.year,
+                    user_id: car.user_id,
+                    customer_service_id: car.customer_service_id
+                };
+            },
+            updateCar() {
+                fetch(`http://127.0.0.1:8000/api/cars/${this.editedCar.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.editedCar)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchCars(); // Refresh the list after update
+                        this.editModeCar = false; // Exit edit mode
+                        this.editedCar = {
+                            id: null,
+                            license_plate: '',
+                            model: '',
+                            brand: '',
+                            color: '',
+                            year: '',
+                            user_id: '',
+                            customer_service_id: ''
+                        }; // Clear editedCar object
+                    })
+                    .catch(error => {
+                        console.error('Error updating car:', error);
+                    });
+            },
+            cancelEditCar() {
+                this.editModeCar = false;
+                this.editedCar = {
+                    id: null,
+                    license_plate: '',
+                    model: '',
+                    brand: '',
+                    color: '',
+                    year: '',
+                    user_id: '',
+                    customer_service_id: ''
+                };
+            },
+            deleteCar(id) {
+                fetch(`http://127.0.0.1:8000/api/cars/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchCars(); // Refresh the list after deletion
+                    })
+                    .catch(error => {
+                        console.error('Error deleting car:', error);
+                    });
+            },
+            fetchRentals() {
+                fetch('http://127.0.0.1:8000/api/rental')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.rentals = data;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching rentals:', error);
+                    });
+            },
+            addRental() {
+                fetch('http://127.0.0.1:8000/api/rental', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.newRental)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchRentals(); // Refresh the list after addition
+                        this.newRental = {
+                            start_date: '',
+                            end_date: '',
+                            car_id: '',
+                            bill_id: ''
+                        }; // Clear input fields
+                    })
+                    .catch(error => {
+                        console.error('Error adding rental:', error);
+                    });
+            },
+            editRental(rental) {
+                this.editModeRental = true;
+                this.editedRental = {
+                    id: rental.id,
+                    start_date: rental.start_date,
+                    end_date: rental.end_date,
+                    car_id: rental.car_id,
+                    bill_id: rental.bill_id
+                };
+            },
+            updateRental() {
+                fetch(`http://127.0.0.1:8000/api/rental/${this.editedRental.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.editedRental)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchRentals(); // Refresh the list after update
+                        this.editModeRental = false; // Exit edit mode
+                        this.editedRental = {
+                            id: null,
+                            start_date: '',
+                            end_date: '',
+                            car_id: '',
+                            bill_id: ''
+                        }; // Clear editedRental object
+                    })
+                    .catch(error => {
+                        console.error('Error updating rental:', error);
+                    });
+            },
+            cancelEditRental() {
+                this.editModeRental = false;
+                this.editedRental = {
+                    id: null,
+                    start_date: '',
+                    end_date: '',
+                    car_id: '',
+                    bill_id: ''
+                };
+            },
+            deleteRental(id) {
+                fetch(`http://127.0.0.1:8000/api/rental/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.fetchRentals(); // Refresh the list after deletion
+                    })
+                    .catch(error => {
+                        console.error('Error deleting rental:', error);
+                    });
+            }
+        },
+        mounted() {
+            this.fetchBills(); // Fetch bills when the component mounts
+            this.fetchCars(); // Fetch cars when the component mounts
+            this.fetchRentals(); // Fetch rentals when the component mounts
+        }
+    });
+    </script>
+</body>
+</html>

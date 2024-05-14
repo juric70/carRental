@@ -52,7 +52,11 @@ Route::controller(BankController::class)->group(function (){
 });
 Route::controller(BillController::class)->group(function (){
     Route::get('/bills', 'index');
+    Route::get('/rentals', 'showRental');
+    Route::get('/rentals/{id}', 'showRentalOne');
+    Route::get('/getForCreate', 'getDataForCreate');
     Route::post('/bills', 'store');
+    Route::post('/rentals', 'createBill');
     Route::get('/bills/{id}', 'show');
     Route::put('/bills/{id}', 'update');
     Route::delete('/bills/{id}', 'destroy');

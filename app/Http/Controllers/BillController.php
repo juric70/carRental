@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bank;
+use App\Models\Car;
+use App\Models\Rental;
 use Illuminate\Http\Request;
 use App\Models\Bill;
 use Illuminate\Support\Facades\Validator;
@@ -94,4 +97,97 @@ class BillController extends Controller
             return response()->json($e->getMessage());
         }
     }
+
+    public function createBill(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'nullable|exists:users,id',
+            'car_id' => 'nullable|exists:cars,id',
+            'bank_id'=> 'nullable|exists:banks,id',
+            'start_date'=>'required|date',
+            'end_date' => 'required|date',
+            'total'=>'required|numeric',
+            'status'=>'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        if ($request->filled('car_id') && $request->filled('car')) {
+            return response()->json(['error' => 'You cannot provide both car_id and car details.'], 422);
+        }
+
+        if ($request->filled('bank_id') && $request->filled('bank')) {
+            return response()->json(['error' => 'You cannot provide both bank_id and bank details.'], 422);
+        }
+
+        $carId = $request->car_id;
+        $bankId = $request->bank_id;
+
+        if ($request->filled('car')) {
+            $validatorCar = Validator::make($request->input('car'), [
+                'license_plate' => 'required|string',
+                'model' => 'required|string',
+                'brand' => 'required|string',
+                'color' => 'required|string',
+                'year' => 'required|string',
+                'user_id' => 'required|exists:users,id',
+                'customer_service_id' => 'nullable|exists:customer_services,id',
+            ]);
+
+            if ($validatorCar->fails()) {
+                return response()->json($validatorCar->errors(), 422);
+            }
+
+            $car = Car::create($validatorCar->validated());
+            $carId = $car->id;
+
+        }
+
+        if ($request->filled('bank')) {
+            $validatorBank = Validator::make($request->input('bank'), [
+                'name'=>'required|unique:banks,name',
+                'code'=>'required|unique:banks,code',
+                'expiry_date'=>'required',
+                'cvv'=>'required|unique:banks,cvv'
+            ]);
+
+            if ($validatorBank->fails()) {
+                return response()->json($validatorBank->errors(), 422);
+            }
+            $bank = Bank::create($validatorBank->validated());
+            $bankId = $bank->id;
+        }
+        $bill = Bill::create([
+            'user_id' => $request->user_id,
+            'total' => $request->total,
+            'status' => $request->status,
+            'bank_id' => $bankId,
+        ]);
+        $rental = Rental::create([
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'car_id' => $carId,
+            'bill_id' => $bill->id
+        ]);
+
+        // Return a success response
+        return response()->json(['message' => 'Bill created successfully', 'bill_id' => $bill->id], 201);
+    }
+
+    public function showRental(){
+        $rental = Rental::with('bill')->with('car')->with('bill.bank')->with('bill.user')->get();
+        return response()->json($rental);
+    }
+    public function showRentalOne($id){
+        $rental = Rental::with('bill')->with('car')->with('bill.bank')->with('bill.user')->find($id);
+        return response()->json($rental);
+    }
+
+    public function getDataForCreate(){
+        $cars = Car::all();
+        $banks = Bank::all();
+        return response()->json(['cars'=> $cars, 'banks'=>$banks ]);
+    }
+
 }
