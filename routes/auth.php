@@ -13,6 +13,8 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
                 ->name('login');
+Route::get('/isLoggedIn', [AuthenticatedSessionController::class, 'isLoggedIn'])
+                ->name('isLoggedIn');
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');

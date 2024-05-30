@@ -11,10 +11,17 @@ class CarController extends Controller
     // INDEX
     public function index()
     {
-        $cars = Car::all();
+        $cars = Car::latest()->take(12)->get();
         return response()->json($cars, 200);
     }
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
 
+        $cars = Car::where('model', 'like', '%' . $query . '%')->get();
+
+        return response()->json($cars, 200);
+    }
     // SHOW
     public function show($id)
     {

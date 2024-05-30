@@ -53,10 +53,12 @@ Route::controller(BankController::class)->group(function (){
 Route::controller(BillController::class)->group(function (){
     Route::get('/bills', 'index');
     Route::get('/rentals', 'showRental');
+    Route::get('/billsEdit', 'showBill');
     Route::get('/rentals/{id}', 'showRentalOne');
     Route::get('/getForCreate', 'getDataForCreate');
     Route::post('/bills', 'store');
     Route::post('/rentals', 'createBill');
+    Route::put('/rentals/{billId}', 'updateBill');
     Route::get('/bills/{id}', 'show');
     Route::put('/bills/{id}', 'update');
     Route::delete('/bills/{id}', 'destroy');
@@ -64,6 +66,7 @@ Route::controller(BillController::class)->group(function (){
 
 Route::controller(CarController::class)->group(function (){
     Route::get('/cars', 'index');
+    Route::get('/cars/search', 'search');
     Route::post('/cars', 'store');
     Route::get('/cars/{id}', 'show');
     Route::put('/cars/{id}', 'update');

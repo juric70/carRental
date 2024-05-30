@@ -190,4 +190,86 @@ class BillController extends Controller
         return response()->json(['cars'=> $cars, 'banks'=>$banks ]);
     }
 
+    public function updateBill(Request $request, $billId){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'nullable|exists:users,id',
+            'car_id' => 'nullable|exists:cars,id',
+            'bank_id'=> 'nullable|exists:banks,id',
+            'start_date'=>'required|date',
+            'end_date' => 'required|date',
+            'total'=>'required|numeric',
+            'status'=>'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $bill = Bill::find($billId);
+
+        if (!$bill) {
+            return response()->json(['error' => 'Bill not found.'], 404);
+        }
+
+        $carId = $request->car_id ?? $bill->rental->car_id;
+        $bankId = $request->bank_id ?? $bill->bank_id;
+
+        if ($request->filled('car')) {
+            $validatorCar = Validator::make($request->input('car'), [
+                'license_plate' => 'required|string',
+                'model' => 'required|string',
+                'brand' => 'required|string',
+                'color' => 'required|string',
+                'year' => 'required|string',
+                'user_id' => 'required|exists:users,id',
+                'customer_service_id' => 'nullable|exists:customer_services,id',
+            ]);
+
+            if ($validatorCar->fails()) {
+                return response()->json($validatorCar->errors(), 422);
+            }
+
+            $car = Car::create($validatorCar->validated());
+            $carId = $car->id;
+
+        }
+
+        if ($request->filled('bank')) {
+            $validatorBank = Validator::make($request->input('bank'), [
+                'name'=>'required|unique:banks,name',
+                'code'=>'required|unique:banks,code',
+                'expiry_date'=>'required',
+                'cvv'=>'required|unique:banks,cvv'
+            ]);
+
+            if ($validatorBank->fails()) {
+                return response()->json($validatorBank->errors(), 422);
+            }
+            $bank = Bank::create($validatorBank->validated());
+            $bankId = $bank->id;
+        }
+
+        $bill->update([
+            'user_id' => $request->user_id,
+            'total' => $request->total,
+            'status' => $request->status,
+            'bank_id' => $bankId,
+        ]);
+
+        $bill->rental->update([
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'car_id' => $carId
+        ]);
+
+        // Return a success response
+        return response()->json(['message' => 'Bill updated successfully', 'bill_id' => $bill->id], 200);
+    }
+
+    public function showBill($billId){
+        $bill = Bill::with('rental')->with('rental.car')->with('user')->with('bank')->find($billId);
+        return response()->json($bill);
+
+    }
+
 }

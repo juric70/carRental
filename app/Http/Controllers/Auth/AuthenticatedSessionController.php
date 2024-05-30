@@ -13,15 +13,28 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): Response
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        return response()->noContent();
-    }
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken; // Ovo je primer za Laravel Sanctum
 
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ]);
+    }
+    public function isLoggedIn(){
+
+        if (Auth::check()) {
+            return response()->json(true);
+        } else {
+            return response()->json(false);
+        }
+    }
     /**
      * Destroy an authenticated session.
      */
