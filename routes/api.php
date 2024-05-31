@@ -44,18 +44,19 @@ Route::controller(StateController::class)->group(function (){
     Route::delete('/states/{id}', 'destroy');
 });
 Route::controller(BankController::class)->group(function (){
-    Route::get('/banks', 'index');
+    Route::get('/banks/{id}', 'index');
     Route::post('/banks', 'store');
-    Route::get('/banks/{id}', 'show');
+    Route::get('/bank/{id}', 'show');
     Route::put('/banks/{id}', 'update');
     Route::delete('/banks/{id}', 'destroy');
 });
 Route::controller(BillController::class)->group(function (){
     Route::get('/bills', 'index');
     Route::get('/rentals', 'showRental');
+    Route::get('/showUserRental/{id}', 'showUserRental');
     Route::get('/billsEdit', 'showBill');
     Route::get('/rentals/{id}', 'showRentalOne');
-    Route::get('/getForCreate', 'getDataForCreate');
+    Route::get('/getForCreate/{id}', 'getDataForCreate');
     Route::post('/bills', 'store');
     Route::post('/rentals', 'createBill');
     Route::put('/rentals/{billId}', 'updateBill');
@@ -66,6 +67,8 @@ Route::controller(BillController::class)->group(function (){
 
 Route::controller(CarController::class)->group(function (){
     Route::get('/cars', 'index');
+    Route::get('/getForCarCreate', 'getForCarCreate');
+    Route::get('/carsAll', 'indexAll');
     Route::get('/cars/search', 'search');
     Route::post('/cars', 'store');
     Route::get('/cars/{id}', 'show');

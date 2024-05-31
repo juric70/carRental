@@ -15,6 +15,16 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
                 ->name('login');
 Route::get('/isLoggedIn', [AuthenticatedSessionController::class, 'isLoggedIn'])
                 ->name('isLoggedIn');
+Route::get('/showAllUsers', [AuthenticatedSessionController::class, 'showAllUsers'])
+                ->name('showAllUsers');
+
+Route::put('/UpdateUserRole/{id}', [AuthenticatedSessionController::class, 'UpdateUserRole'])
+                ->name('UpdateUserRole');
+
+Route::put('/UpdateUserProfile/{id}', [AuthenticatedSessionController::class, 'UpdateUserProfile'])
+                ->name('UpdateUserProfile');
+Route::get('/getUserProfile/{id}', [AuthenticatedSessionController::class, 'getUserProfile'])
+                ->name('getUserProfile');
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');

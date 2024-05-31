@@ -19,7 +19,7 @@ class RentalController extends Controller
     public function show($id)
     {
         try {
-            $rental = Rental::findOrFail($id);
+            $rental = Rental::with('car', 'bill')->findOrFail($id);
             return response()->json($rental);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

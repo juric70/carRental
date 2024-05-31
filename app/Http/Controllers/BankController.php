@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Validator;
 class BankController extends Controller
 {
     // INDEX
-    public function index()
+    public function index($id)
     {
-        $banks = Bank::all();
+        $banks = Bank::where('user_id', $id)->get();
         return response()->json($banks, 200);
     }
 
@@ -31,10 +31,11 @@ class BankController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|max:255|unique:banks',
+                'name' => 'required|max:255',
                 'code' => 'required|max:255|unique:banks',
                 'expiry_date' => 'required|date',
                 'cvv' => 'required|max:255',
+                'user_id' => 'required|exists:users,id',
             ]);
 
             if ($validator->fails()) {
@@ -46,6 +47,7 @@ class BankController extends Controller
                 'code' => $request->code,
                 'expiry_date' => $request->expiry_date,
                 'cvv' => $request->cvv,
+                'user_id' => $request->user_id,
             ]);
 
             return response()->json($bank, 201);
@@ -59,10 +61,11 @@ class BankController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|max:255|unique:banks,name,' . $id,
+                'name' => 'required|max:255',
                 'code' => 'required|max:255|unique:banks,code,' . $id,
                 'expiry_date' => 'required|date',
                 'cvv' => 'required|max:255',
+                'user_id' => 'nullable|exists:users,id',
             ]);
 
             if ($validator->fails()) {
@@ -75,6 +78,7 @@ class BankController extends Controller
                 'code' => $request->code,
                 'expiry_date' => $request->expiry_date,
                 'cvv' => $request->cvv,
+                'user_id' => $request->user_id,
             ]);
 
             return response()->json($bank, 200);
